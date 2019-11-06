@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TestGenerator.ClassMembers;
 
 namespace TestGenerator
 {
@@ -19,30 +20,29 @@ namespace TestGenerator
                 GenerateTestFromTree(root));
         }
         
-        private List<MethodMetadata> GetMethods(ClassDeclarationSyntax Class)
+        private List<MethodInfo> GetMethods(ClassDeclarationSyntax Class)
         {
             var methods = Class.DescendantNodes()
                 .OfType<MethodDeclarationSyntax>()
                 .Where(method => method.Modifiers
                 .Any(modifier => modifier.ToString() == "public"));
 
-            var result = new List<MethodMetadata>();
+            var result = new List<MethodInfo>();
 
             foreach (var method in methods)
             {
-                result.Add(new MethodMetadata() { Name = method.Identifier.ToString(), ReturnType = method.ReturnType, parameters = GetParametersMetadata(method) });
+                result.Add(new MethodInfo(method.Identifier.ToString(), method.ReturnType, GetParameters(method)));
             }
 
             return result;
         }
 
-        private IEnumerable<ParameterMetadata> GetParameters(MethodDeclarationSyntax method)
+        private List<ParameterInfo> GetParameters(MethodDeclarationSyntax method)
         {
-            return method.ParameterList.Parameters.Select(param => new ParameterMetadata()
-            { Name = param.Type.GetTypeName(), Type = param.Type });
+            return method.ParameterList.Parameters.Select(param => new ParameterInfo(param.Identifier.Value.ToString(), param.Type)).ToList();
         }
 
-        private IEnumerable<ParameterMetadata> GetClassDependencies(ClassDeclarationSyntax Class)
+        private List<ParameterInfo> GetClassDependencies(ClassDeclarationSyntax Class)
         {
             var constructors = Class.DescendantNodes()
                 .OfType<ConstructorDeclarationSyntax>()
@@ -52,26 +52,19 @@ namespace TestGenerator
             foreach (var constructor in constructors)
             {
                 var dependencies = constructor.ParameterList.Parameters.Where(param =>
-                param.Type.GetTypeName()
-                .StartsWith("I"));
+                param.ToString().StartsWith("I"));
 
                 if (!dependencies.Count().Equals(0))
-                    return dependencies.Select(param => new ParameterMetadata()
-                    {
-                        Name = param.Identifier.Value.ToString(),
-                        Type = param.Type
-                    });
+                    return dependencies.Select(param => new ParameterInfo(param.Identifier.Value.ToString(), param.Type)).ToList();
             }
-
-            // no dependencies were found
-
+            
             return null;
         }
 
         private string GenerateTestFromTree(SyntaxNode root)
         {
             //there may be more than one class in one file
-            var classesInfo = new List<ClassMetadata>();
+            var classesInfo = new List<ClassInfo>();
 
             var classes = new List<ClassDeclarationSyntax>(root.DescendantNodes().OfType<ClassDeclarationSyntax>());
 
@@ -79,17 +72,11 @@ namespace TestGenerator
 
             foreach (var Class in classes)
             {
-                classesInfo.Add(new ClassMetadata()
-                {
-                    Methods = GetClassMethods(Class),
-                    Name = Class.Identifier.ToString(),
-                    NameSpace = ((NamespaceDeclarationSyntax)Class.Parent).Name.ToString(),
-                    Dependencies = GetClassDependencies(Class),
-
-                });
+                classesInfo.Add(new ClassInfo(Class.Identifier.ToString(), ((NamespaceDeclarationSyntax)Class.Parent).Name.ToString(), 
+                    GetMethods(Class), GetClassDependencies(Class)));
             }
 
-            return TestClassesGenerator.Generate(classesInfo, usings);
+            return null;// TODO generate
         }
     }
 }

@@ -7,16 +7,14 @@ using System.Threading.Tasks;
 
 namespace TestGenerator.ClassMembers
 {
-    class MethodInfo
+    class ParameterInfo
     {
         public string Name { get; set; }
-        public TypeSyntax ReturnType { get; set; }
-        public List<ParameterInfo> Parameters { get; set; }
-        public MethodInfo(string name, TypeSyntax returnType, List<ParameterInfo> parameters)
+        public TypeSyntax Type { get; set; }
+        public ParameterInfo(string name, TypeSyntax type)
         {
             Name = name;
-            ReturnType = returnType;
-            Parameters = parameters;
+            Type = type;
         }
     }
 }
