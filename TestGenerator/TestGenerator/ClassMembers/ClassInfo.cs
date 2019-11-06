@@ -11,13 +11,11 @@ namespace TestGenerator.ClassMembers
         public string Name { get; set; }
         public string NameSpace { get; set; }
         public List<MethodInfo> Methods { get; set; }
-        public List<ParameterInfo> Dependencies { get; set; }
-        public ClassInfo(string name, string nameSpace, List<MethodInfo> methods, List<ParameterInfo> dependencies)
+        public ClassInfo(string name, string nameSpace, List<MethodInfo> methods)
         {
             Name = name;
             NameSpace = nameSpace;
             Methods = methods;
-            Dependencies = dependencies;
         }
     }
 }

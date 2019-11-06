@@ -13,11 +13,11 @@ namespace TestGeneratorTest
     public class Tests
     {
         [Test]
-        public void kek()
+        public async Task kek()
         {
             Generator gen = new Generator(new List<string> { "D:\\spp\\TestGenerator\\TestGenerator\\TestGenerator.Test\\SimpleClass.cs" }, "D:\\spp\\TestGenerator\\generatedClasses", 10, 10, 10);
-            gen.Generate();
-            Thread.Sleep(10000);
+            await gen.Generate();
+            Thread.Sleep(1000);
         }
     }
 }

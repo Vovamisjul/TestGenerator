@@ -42,25 +42,6 @@ namespace TestGenerator
             return method.ParameterList.Parameters.Select(param => new ParameterInfo(param.Identifier.Value.ToString(), param.Type)).ToList();
         }
 
-        private List<ParameterInfo> GetClassDependencies(ClassDeclarationSyntax Class)
-        {
-            var constructors = Class.DescendantNodes()
-                .OfType<ConstructorDeclarationSyntax>()
-                .Where(method => method.Modifiers
-                .Any(modifier => modifier.ToString() == "public"));
-
-            foreach (var constructor in constructors)
-            {
-                var dependencies = constructor.ParameterList.Parameters.Where(param =>
-                param.ToString().StartsWith("I"));
-
-                if (!dependencies.Count().Equals(0))
-                    return dependencies.Select(param => new ParameterInfo(param.Identifier.Value.ToString(), param.Type)).ToList();
-            }
-            
-            return null;
-        }
-
         private string GenerateTestFromTree(SyntaxNode root)
         {
             //there may be more than one class in one file
@@ -73,10 +54,10 @@ namespace TestGenerator
             foreach (var Class in classes)
             {
                 classesInfo.Add(new ClassInfo(Class.Identifier.ToString(), ((NamespaceDeclarationSyntax)Class.Parent).Name.ToString(), 
-                    GetMethods(Class), GetClassDependencies(Class)));
+                    GetMethods(Class)));
             }
 
-            return null;// TODO generate
+            return TestClassesGenerator.Generate(classesInfo, usings);// TODO generate
         }
     }
 }

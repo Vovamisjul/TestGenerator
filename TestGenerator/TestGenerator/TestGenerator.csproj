@@ -148,6 +148,7 @@
     <Compile Include="Generator.cs" />
     <Compile Include="MainGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestClassesGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
