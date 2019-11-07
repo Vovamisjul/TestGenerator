@@ -143,6 +143,7 @@
   <ItemGroup>
     <Compile Include="ClassMembers\ClassInfo.cs" />
     <Compile Include="ClassMembers\MethodInfo.cs" />
+    <Compile Include="ClassMembers\NamespaceInfo.cs" />
     <Compile Include="ClassMembers\ParameterInfo.cs" />
     <Compile Include="CSFile.cs" />
     <Compile Include="Generator.cs" />

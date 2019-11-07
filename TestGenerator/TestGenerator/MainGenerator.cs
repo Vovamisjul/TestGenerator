@@ -45,19 +45,25 @@ namespace TestGenerator
         private string GenerateTestFromTree(SyntaxNode root)
         {
             //there may be more than one class in one file
-            var classesInfo = new List<ClassInfo>();
+            var namespacesInfo = new List<NamespaceInfo>();
 
             var classes = new List<ClassDeclarationSyntax>(root.DescendantNodes().OfType<ClassDeclarationSyntax>());
 
             var usings = new List<UsingDirectiveSyntax>(root.DescendantNodes().OfType<UsingDirectiveSyntax>());
 
-            foreach (var Class in classes)
+            var namespaces = new List<NamespaceDeclarationSyntax>(root.DescendantNodes().OfType<NamespaceDeclarationSyntax>());
+
+            foreach (var ns in namespaces)
             {
-                classesInfo.Add(new ClassInfo(Class.Identifier.ToString(), ((NamespaceDeclarationSyntax)Class.Parent).Name.ToString(), 
-                    GetMethods(Class)));
+                var nsClasses = new List<ClassInfo>();
+                foreach (var Class in classes.Where(Class => ((NamespaceDeclarationSyntax)Class.Parent).Name.ToString() == ns.Name.ToString()))
+                {
+                    nsClasses.Add(new ClassInfo(Class.Identifier.ToString(), GetMethods(Class)));
+                }
+                namespacesInfo.Add(new NamespaceInfo(ns.Name.ToString(), nsClasses));
             }
 
-            return TestClassesGenerator.Generate(classesInfo, usings);// TODO generate
+            return TestClassesGenerator.Generate(namespacesInfo, usings);
         }
     }
 }

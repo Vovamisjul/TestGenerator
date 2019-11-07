@@ -15,9 +15,8 @@ namespace TestGeneratorTest
         [Test]
         public async Task kek()
         {
-            Generator gen = new Generator(new List<string> { "D:\\spp\\TestGenerator\\TestGenerator\\TestGenerator.Test\\SimpleClass.cs" }, "D:\\spp\\TestGenerator\\generatedClasses", 10, 10, 10);
-            await gen.Generate();
-            Thread.Sleep(1000);
+            Generator gen = new Generator(new List<string> { "D:\\spp\\TestGenerator\\TestGenerator\\TestGenerator.Test\\SimpleClass.cs", "D:\\spp\\TestGenerator\\TestGenerator\\TestGenerator.Test\\ManyClasses.cs", "D:\\spp\\TestGenerator\\TestGenerator\\TestGenerator.Test\\ManyNamespaces.cs" }, "D:\\spp\\TestGenerator\\generatedClasses", 10, 10, 10);
+            await gen.GenerateAsync();
         }
     }
 }

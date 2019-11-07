@@ -16,5 +16,5 @@ namespace MyNamespace1
         {
             return 1;
         }
-    }
+    } 
 }

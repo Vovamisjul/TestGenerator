@@ -11,55 +11,35 @@ namespace TestGenerator
 {
     class TestClassesGenerator
     {
-        public static string Generate(List<ClassInfo> classInfo, List<UsingDirectiveSyntax> usings)
+        public static string Generate(List<NamespaceInfo> namespacesInfo, List<UsingDirectiveSyntax> usings)
         {
-            var result = string.Empty;
-            foreach (ClassInfo Class in classInfo)
+            string result = "";
+            CompilationUnitSyntax testUsings = SyntaxFactory.CompilationUnit()
+                .WithUsings(GetDefaultUsings(namespacesInfo, usings));
+            result += testUsings.NormalizeWhitespace().ToFullString();
+            foreach (var namespaceInfo in namespacesInfo)
             {
                 NamespaceDeclarationSyntax namespaceDeclaration = SyntaxFactory.NamespaceDeclaration(
-                    SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName(Class.NameSpace), SyntaxFactory.IdentifierName("NUnitTests")));
-
-                CompilationUnitSyntax testClass = SyntaxFactory.CompilationUnit()
-                    .WithUsings(GetDefaultUsings(Class, usings))
-                    .WithMembers(SyntaxFactory.SingletonList<MemberDeclarationSyntax>(
-                        namespaceDeclaration
-                        .WithMembers(SyntaxFactory.SingletonList<MemberDeclarationSyntax>(
-
-                           SyntaxFactory.ClassDeclaration(Class.Name + "Test")
-
-                            .WithModifiers(SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword)))
-
-                            .WithAttributeLists(
-                                SyntaxFactory.SingletonList(
-                                    SyntaxFactory.AttributeList(
-                                        SyntaxFactory.SingletonSeparatedList(
-                                            SyntaxFactory.Attribute(
-                                                SyntaxFactory.IdentifierName("TestFixture"))))))
-                            .WithMembers(GetMethodsAndProperties(Class))))));
-
-                result += testClass.NormalizeWhitespace().ToFullString();
+                SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName(namespaceInfo.Name), SyntaxFactory.IdentifierName("Tests")));
+                SyntaxList<MemberDeclarationSyntax> testClasses = new SyntaxList<MemberDeclarationSyntax>();
+                foreach (var Class in namespaceInfo.Classes)
+                {
+                    testClasses = testClasses.Add(SyntaxFactory.ClassDeclaration(Class.Name + "Tests")
+                                .WithModifiers(SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword)))
+                                .WithAttributeLists(
+                                    SyntaxFactory.SingletonList(
+                                        SyntaxFactory.AttributeList(
+                                            SyntaxFactory.SingletonSeparatedList(
+                                                SyntaxFactory.Attribute(
+                                                    SyntaxFactory.IdentifierName("TestFixture"))))))
+                                .WithMembers(GetMethodsAndProperties(Class)));
+                }
+                result += "\r\n" + namespaceDeclaration.WithMembers(testClasses).NormalizeWhitespace().ToFullString();
             }
 
             return result;
         }
-
-        private static SyntaxList<MemberDeclarationSyntax> GetTestClassDependencies(ClassInfo Class)
-        {
-            var result = new List<MemberDeclarationSyntax>();
-
-            result.Add(SyntaxFactory.PropertyDeclaration(
-                SyntaxFactory.ParseTypeName(Class.Name), GetTestClassName(Class.Name))
-                 .AddModifiers(SyntaxFactory.Token(SyntaxKind.PrivateKeyword))
-                .AddAccessorListAccessors(
-                    SyntaxFactory.AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
-                    .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken)),
-                    SyntaxFactory.AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
-                    .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
-                ));
-
-            return new SyntaxList<MemberDeclarationSyntax>().AddRange(result);
-        }
-        private static SyntaxList<UsingDirectiveSyntax> GetDefaultUsings(ClassInfo Class, List<UsingDirectiveSyntax> classUsings)
+        private static SyntaxList<UsingDirectiveSyntax> GetDefaultUsings(List<NamespaceInfo> namespaces, List<UsingDirectiveSyntax> classUsings)
         {
             classUsings.Add(SyntaxFactory.UsingDirective
                  (
@@ -69,10 +49,11 @@ namespace TestGenerator
                         SyntaxFactory.IdentifierName("Framework")
                     )
                  ));
-            classUsings.Add(SyntaxFactory.UsingDirective
-                 (
-                    SyntaxFactory.IdentifierName(Class.NameSpace)
-                 ));
+            foreach (var namespaceInfo in namespaces)
+                classUsings.Add(SyntaxFactory.UsingDirective
+                     (
+                        SyntaxFactory.IdentifierName(namespaceInfo.Name)
+                     ));
 
             return new SyntaxList<UsingDirectiveSyntax>().AddRange(classUsings);
 
@@ -80,7 +61,7 @@ namespace TestGenerator
 
         private static SyntaxList<MemberDeclarationSyntax> GetMethodsAndProperties(ClassInfo Class)
         {
-            var methodsAndProperties = new List<MemberDeclarationSyntax>(GetTestClassDependencies(Class));
+            var methodsAndProperties = new List<MemberDeclarationSyntax>();
 
             foreach (var method in Class.Methods)
             {

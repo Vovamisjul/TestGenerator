@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace TestGenerator.ClassMembers
 {
-    class ClassInfo
+    class NamespaceInfo
     {
-        public string Name { get; set; }
-        public List<MethodInfo> Methods { get; set; }
-        public ClassInfo(string name, List<MethodInfo> methods)
+        public NamespaceInfo(string name, List<ClassInfo> classes)
         {
             Name = name;
-            Methods = methods;
+            Classes = classes;
         }
+        public string Name { get; set; }
+        public List<ClassInfo> Classes { get; set; }
     }
 }
