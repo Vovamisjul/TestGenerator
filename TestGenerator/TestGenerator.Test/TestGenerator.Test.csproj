@@ -50,8 +50,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ManyClasses.cs" />
+    <Compile Include="ManyClassesTest.cs" />
     <Compile Include="ManyNamespaces.cs" />
+    <Compile Include="ManyNamespacesTest.cs" />
     <Compile Include="SimpleClass.cs" />
+    <Compile Include="SimpleClassTest.cs" />
     <Compile Include="Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -82,10 +82,5 @@ namespace TestGenerator
 
             return new SyntaxList<MemberDeclarationSyntax>().AddRange(methodsAndProperties);
         }
-
-        private static string GetTestClassName(string className)
-        {
-            return "_" + className.ToLower()[0] + className.Substring(1);
-        }
     }
 }

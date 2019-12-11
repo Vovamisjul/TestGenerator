@@ -25,7 +25,7 @@ namespace TestGenerator
             _maxFileToWrite = maxFileToWrite;
             _maxThreads = maxThreads;
         }
-        public void Generate()
+        public async Task GenerateAsync()
         {
             ExecutionDataflowBlockOptions maxFilesToLoadTasks = new ExecutionDataflowBlockOptions
             {
@@ -62,21 +62,9 @@ namespace TestGenerator
             }
             loadFiles.Complete();
 
-            loadFiles.Completion.Wait();
-
-            getTestClasses.Complete();
-
-            getTestClasses.Completion.Wait();
-
-            writeResult.Complete();
-
-            writeResult.Completion.Wait();
+            await writeResult.Completion;
         }
 
-        public async Task GenerateAsync()
-        {
-            await Task.Run((Action)Generate);
-        }
         private async Task<CSFile> LoadTextFromFile(string inputFile)
         {
             using (var reader = new StreamReader(new FileStream(inputFile, FileMode.Open)))

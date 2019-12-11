@@ -23,7 +23,7 @@ namespace ConsoleTestGenerator
                 var maxOutStreams = int.Parse(Console.ReadLine());
                 Console.WriteLine("Write max amount of streams for generating tests");
                 var maxMainStreams = int.Parse(Console.ReadLine());
-                new Generator(testFiles, folder, maxInputStreams, maxOutStreams, maxMainStreams).Generate();
+                new Generator(testFiles, folder, maxInputStreams, maxOutStreams, maxMainStreams).GenerateAsync().Wait();
             }
             catch (Exception e)
             {

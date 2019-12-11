@@ -9,8 +9,8 @@ namespace TestGenerator
 {
     class CSFile
     {
-        public string FileName;
-        public string Text;
+        public string FileName { get; }
+        public string Text { get; }
         public CSFile(string fileName, string text)
         {
             FileName = fileName;
